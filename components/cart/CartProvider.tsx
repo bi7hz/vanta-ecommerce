@@ -19,11 +19,13 @@ export type CartItem = {
 
 type CartContextValue = {
   items: CartItem[];
+  isHydrated: boolean;
   itemCount: number;
   subtotal: number;
   addItem: (item: Omit<CartItem, "key">) => void;
   updateQuantity: (key: string, quantity: number) => void;
   removeItem: (key: string) => void;
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -34,12 +36,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    let savedItems: CartItem[] = [];
     try {
       const saved = window.localStorage.getItem(storageKey);
-      if (saved) setItems(JSON.parse(saved) as CartItem[]);
+      if (saved) savedItems = JSON.parse(saved) as CartItem[];
     } catch {
       window.localStorage.removeItem(storageKey);
-    } finally { setHasLoaded(true); }
+    }
+    queueMicrotask(() => {
+      if (!active) return;
+      setItems(savedItems);
+      setHasLoaded(true);
+    });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -49,6 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartContextValue>(() => ({
     items,
+    isHydrated: hasLoaded,
     itemCount: items.reduce((total, item) => total + item.quantity, 0),
     subtotal: items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
     addItem: (nextItem) => setItems((current) => {
@@ -60,7 +71,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }),
     updateQuantity: (key, quantity) => setItems((current) => current.map((item) => item.key === key ? { ...item, quantity: Math.max(1, Math.min(item.maxQuantity ?? 99, quantity)) } : item)),
     removeItem: (key) => setItems((current) => current.filter((item) => item.key !== key)),
-  }), [items]);
+    clearCart: () => {
+      setItems([]);
+      try { window.localStorage.setItem(storageKey, "[]"); } catch { /* storage can be unavailable */ }
+    },
+  }), [hasLoaded, items]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

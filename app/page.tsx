@@ -1,5 +1,6 @@
 import { Announcement, Footer, SiteHeader } from "@/components/shell";
-import { Button, Container, Heading, IconButton, Section, SectionHeader } from "@/components/ui";
+import { Button, Container, Heading, Section, SectionHeader } from "@/components/ui";
+import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { getProductBySlug, products as shopProducts, type ShopCategory, type ShopProduct } from "@/lib/products";
 import Image from "next/image";
 import Link from "next/link";
@@ -39,14 +40,13 @@ export default function Home() {
 
 function FreshPickCard({ product }: { product: ShopProduct }) {
   const hasAlternateHoverImage = product.primaryImage !== product.hoverImage;
-  return <article className="product"><Link aria-label={`View ${product.name}`} className={"product__media media-slot media-slot--image " + (hasAlternateHoverImage ? "product__media--swap" : "product__media--zoom")} href={`/product/${product.slug}`}><Image className="product__primary-image" src={product.primaryImage} alt={product.brand + " " + product.name} fill sizes="(max-width: 767px) 46vw, (max-width: 1023px) 23vw, 20vw" style={{ objectFit: "contain" }} />{hasAlternateHoverImage ? <Image className="product__hover-image" src={product.hoverImage} alt="" aria-hidden="true" fill sizes="(max-width: 767px) 46vw, (max-width: 1023px) 23vw, 20vw" style={{ objectFit: "contain" }} /> : null}{product.isNew || product.isSale ? <span className="product__badge">{product.isSale ? "Sale" : "New"}</span> : null}</Link><IconButton label={"Add " + product.name + " to wishlist"} className="product__heart"><Heart /></IconButton><Link className="product__details" href={`/product/${product.slug}`}><p>{product.brand}</p><h3>{product.name}</h3><strong>${product.price}</strong>{product.originalPrice ? <del>${product.originalPrice}</del> : null}</Link></article>;
+  return <article className="product"><Link aria-label={`View ${product.name}`} className={"product__media media-slot media-slot--image " + (hasAlternateHoverImage ? "product__media--swap" : "product__media--zoom")} href={`/product/${product.slug}`}><Image className="product__primary-image" src={product.primaryImage} alt={product.brand + " " + product.name} fill sizes="(max-width: 767px) 46vw, (max-width: 1023px) 23vw, 20vw" style={{ objectFit: "contain" }} />{hasAlternateHoverImage ? <Image className="product__hover-image" src={product.hoverImage} alt="" aria-hidden="true" fill sizes="(max-width: 767px) 46vw, (max-width: 1023px) 23vw, 20vw" style={{ objectFit: "contain" }} /> : null}{product.isNew || product.isSale ? <span className="product__badge">{product.isSale ? "Sale" : "New"}</span> : null}</Link><WishlistButton product={product} className="product__heart" /><Link className="product__details" href={`/product/${product.slug}`}><p>{product.brand}</p><h3>{product.name}</h3><strong>${product.price}</strong>{product.originalPrice ? <del>${product.originalPrice}</del> : null}</Link></article>;
 }
 
 function MediaSlot({ className = "", src, alt, priority = false, objectPosition = "center" }: { className?: string; src: string; alt: string; priority?: boolean; objectPosition?: string }) {
   return <div className={"media-slot media-slot--image " + className}><Image src={src} alt={alt} fill priority={priority} sizes="(max-width: 767px) 100vw, 60vw" style={{ objectFit: "cover", objectPosition }} /></div>;
 }
 function Arrow() { return <svg aria-hidden="true" viewBox="0 0 16 16"><path d="M2 8h11M9 3l5 5" fill="none" stroke="currentColor" strokeWidth="1.2" /></svg>; }
-function Heart() { return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.8 4.9a5.4 5.4 0 0 0-7.7 0L12 6l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 21l8.8-8.4a5.4 5.4 0 0 0 0-7.7Z" /></svg>; }
 function SneakerIcon() { return <svg className="category-tile__icon" viewBox="0 0 36 28" aria-hidden="true"><path d="M3 19c5 0 9-3 11-8l5 5c4 3 8 4 14 4v5H3v-6Z" /><path d="M11 19h4m2 0h4m2 0h4" /></svg>; }
 function TeeIcon() { return <svg className="category-tile__icon" viewBox="0 0 36 28" aria-hidden="true"><path d="m12 4 6 3 6-3 8 7-4 5-4-3v11H12V13l-4 3-4-5 8-7Z" /></svg>; }
 function HoodieIcon() { return <svg className="category-tile__icon" viewBox="0 0 36 28" aria-hidden="true"><path d="M12 7c0-4 3-6 6-6s6 2 6 6l7 5-3 5-4-2v10H12V15l-4 2-3-5 7-5Z" /><path d="M14 7c1 2 7 2 8 0" /></svg>; }

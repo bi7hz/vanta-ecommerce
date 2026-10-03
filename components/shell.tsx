@@ -47,7 +47,7 @@ function SiteHeaderContent() {
       <div className="header-actions">
         <IconButton label="Search"><Search /></IconButton>
         <IconButton label="Account" className="desktop-action"><User /></IconButton>
-        <Link className="icon-button desktop-action" href="/wishlist" aria-label={`Wishlist, ${wishlistItems.length} items`}><Heart />{wishlistItems.length ? <small>{wishlistItems.length}</small> : null}</Link>
+        <Link className="icon-button" href="/wishlist" aria-label={`View wishlist${wishlistItems.length ? `, ${wishlistItems.length} items` : ""}`}><Heart />{wishlistItems.length ? <small>{wishlistItems.length}</small> : null}</Link>
         <Link className="icon-button" href="/cart" aria-label={`Shopping bag, ${itemCount} items`}><Bag /><small>{itemCount}</small></Link>
       </div>
     </Container>
